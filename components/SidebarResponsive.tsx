@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 import {
-  ChartBarIcon,
-  Cog6ToothIcon,
-  UserIcon,
+  BuildingOffice2Icon,
+  TicketIcon,
+  UserCircleIcon,
+  UsersIcon,
   HomeIcon,
-  PuzzlePieceIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Sidebar({
   collapsed,
@@ -19,46 +21,118 @@ export default function Sidebar({
   isMobileOpen?: boolean;
   closeMobile?: () => void;
 }) {
+  const pathname = usePathname();
+
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUser({
+          email: data.user.email,
+          name: data.user.user_metadata?.full_name || "User",
+        });
+      }
+    };
+    fetchUser();
+  }, []);
+
   const links = [
-    { href: '/dashboard/analytics', label: 'Analytics', icon: <ChartBarIcon className="w-6 h-6" /> },
-    { href: '/dashboard/settings', label: 'Settings', icon: <Cog6ToothIcon className="w-6 h-6" /> },
-    { href: '/dashboard/profile', label: 'Profile', icon: <UserIcon className="w-6 h-6" /> },
-    { href: '/dashboard/reports', label: 'Reports', icon: <HomeIcon className="w-6 h-6" /> },
-    { href: '/dashboard/integrations', label: 'Integrations', icon: <PuzzlePieceIcon className="w-6 h-6" /> },
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      icon: <HomeIcon className="w-6 h-6" />,
+    },
+    {
+      href: "/dashboard/sites",
+      label: "Sites",
+      icon: <BuildingOffice2Icon className="w-6 h-6" />,
+    },
+    {
+      href: "/dashboard/tickets",
+      label: "Tickets",
+      icon: <TicketIcon className="w-6 h-6" />,
+    },
+    {
+      href: "/dashboard/clients",
+      label: "Clients",
+      icon: <UsersIcon className="w-6 h-6" />,
+    },
+    {
+      href: "/dashboard/profile",
+      label: "Profile",
+      icon: <UserCircleIcon className="w-6 h-6" />,
+    },
   ];
 
   return (
     <aside
-      className={`
-        fixed z-50 top-0 left-0 h-full transition-transform duration-300
-        ${collapsed ? 'w-20' : 'w-64'}
-        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        bg-white dark:bg-gray-900 border-r shadow-lg lg:translate-x-0 lg:relative lg:z-0
+      className={`fixed bg-[#f2fafc] z-50 top-0 left-0 h-full transition-transform duration-300
+        ${collapsed ? "w-20" : "w-64"}
+        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+        bg-[#f2fafc] dark:bg-gray-900 border-r shadow-lg lg:translate-x-0 lg:relative lg:z-0
       `}
     >
-      <div className="p-4 flex items-center justify-between">
-        <span className="text-xl font-bold text-gray-900 dark:text-white">
-          {collapsed ? '🚀' : 'MyApp'}
-        </span>
-        <button className="lg:hidden" onClick={closeMobile}>
-          <XMarkIcon className="w-6 h-6 text-gray-900 dark:text-white" />
-        </button>
+      {/* Header */}
+      <div className={`${collapsed ? "px-2 pt-4 w-20" : "px-8 pt-4"}`}>
+        <img
+          src="/saferay-group-logo-light.png"
+          alt="Logo Light"
+          className="block dark:hidden w-auto h-8"
+        />
+        <img
+          src="/saferay-group-logo-dark.png"
+          alt="Logo Dark"
+          className="hidden dark:block w-auto h-8"
+        />
       </div>
-      <nav className="py-4">
-        <ul className="space-y-2">
-          {links.map(({ href, label, icon }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white rounded transition"
-              >
-                {icon}
-                {!collapsed && <span>{label}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+
+      {/* Navigation */}
+      <div className="flex justify-center">
+        <nav className="py-4 w-full">
+          <ul className="space-y-2">
+            {links.map(({ href, label, icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`flex items-center gap-3 px-4 py-4 rounded transition
+                    hover:bg-[#d8f1f5] dark:hover:bg-gray-800 text-gray-900 dark:text-white
+                    ${pathname === href ? "bg-[#d8f1f5] dark:bg-gray-800" : ""}
+                  `}
+                >
+                  {icon}
+                  {!collapsed && <span>{label}</span>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      {/* Footer – User info */}
+      <div className="absolute bottom-0 w-full border-t border-gray-200 dark:border-gray-700 p-4">
+        {user && (
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            <div className="w-10 h-10 rounded-full bg-[#0096a2] text-white flex items-center justify-center text-sm font-bold">
+              {user.email?.charAt(0).toUpperCase() || "?"}
+            </div>
+
+            {/* Name/Email (only if sidebar is expanded) */}
+            {!collapsed && (
+              <div className="text-sm text-gray-800 dark:text-gray-200">
+                <div className="font-medium">{user.name}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {user.email}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

@@ -1,24 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       setError(error.message);
     } else {
       document.cookie = `sb-access-token=${data.session?.access_token}; max-age=7200; path=/`;
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   };
 
@@ -32,7 +35,7 @@ export default function LoginPage() {
           preserveAspectRatio="none"
         >
           <path
-            fill="#3b82f6"
+            fill="#0096a2"
             fillOpacity="0.3"
             d="M0,192L60,192C120,192,240,192,360,186.7C480,181,600,171,720,176C840,181,960,203,1080,213.3C1200,224,1320,224,1380,224L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
           ></path>
@@ -44,7 +47,9 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="relative z-10 bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-5"
       >
-        <h1 className="text-3xl font-semibold text-center text-gray-800">Welcome Back</h1>
+        <div className="flex justify-center mb-4">
+          <img src="/saferay-group-logo-light.png" alt="Logo" className="h-12 w-auto" />
+        </div>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         <div>
@@ -71,7 +76,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium transition"
+          className="w-full bg-[#0096a2] text-white py-2 rounded font-medium"
         >
           Login
         </button>

@@ -47,7 +47,7 @@ export default function Topbar({
   const firstLetter = userEmail?.charAt(0)?.toUpperCase() || "?";
 
   return (
-    <header className="h-16 bg-white dark:bg-gray-900 border-b px-6 flex items-center justify-between">
+    <header className="h-16 bg-[#f2fafc] dark:bg-gray-900 border-b px-6 flex items-center justify-between">
       <div className="flex items-center gap-4">
         {/* Mobile: open sidebar */}
         <button onClick={openMobile} className="block lg:hidden">
@@ -67,7 +67,7 @@ export default function Topbar({
       <div className="relative">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold"
+          className="bg-[#0096a2] text-white w-10 h-10 rounded-full flex items-center justify-center font-bold"
         >
           {firstLetter}
         </button>

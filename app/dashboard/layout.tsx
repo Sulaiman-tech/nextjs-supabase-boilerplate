@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           toggleSidebar={() => setCollapsed(!collapsed)} // desktop collapse
           openMobile={() => setSidebarOpen(true)}        // mobile open
         />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>
