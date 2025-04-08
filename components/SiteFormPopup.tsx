@@ -96,7 +96,6 @@ export default function SiteFormPopup({
 
     if (error) {
       console.error("Upload error:", error.message);
-      alert("Upload failed: " + error.message);
       return null;
     }
 
@@ -105,15 +104,15 @@ export default function SiteFormPopup({
 
   const handleSubmit = async () => {
     const aerialPath = aerialFile
-      ? await uploadFile(aerialFile, "site.aerial")
+      ? await uploadFile(aerialFile, "saferay/sites/site_aerial")
       : site?.representative_aerial_url;
 
     const layoutPath = layoutFile
-      ? await uploadFile(layoutFile, "site.layout")
+      ? await uploadFile(layoutFile, "saferay/sites/site_layout")
       : site?.representative_layout_url;
 
     const docPath = docFile
-      ? await uploadFile(docFile, "site.docs")
+      ? await uploadFile(docFile, "saferay/sites/site_docs")
       : site?.site_documentation_url;
 
     const payload = {
@@ -143,7 +142,6 @@ export default function SiteFormPopup({
     if (error) {
       alert("Error saving site: " + error.message);
     } else {
-      alert("Site saved!");
       onSave();
       onClose();
     }
@@ -153,17 +151,23 @@ export default function SiteFormPopup({
   const isBESS = formData.type.includes("BESS");
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50">
-      <div className="bg-white w-full sm:max-w-4xl sm:w-[48rem] h-full overflow-y-auto p-6 space-y-4 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600"
-        >
-          <XMarkIcon className="w-6 h-6" />
-        </button>
-        <h2 className="text-2xl font-semibold mb-4">
-          {site ? "Edit Site" : "Add New Site"}
-        </h2>
+    <div
+      className={`fixed right-0  bottom-0 left-0 z-50 bg-black/40 flex justify-end items-start sm:p-4 md:p-0 ${
+        site ? "top-0" : "-top-8"
+      }`}
+    >
+      <div className="bg-white w-full sm:max-w-4xl sm:w-[48rem] h-full overflow-y-auto p-6 space-y-4 relative overflow-x-hidden">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#0096a2] dark:text-white">
+            {site ? "Edit Site" : "Add New Site"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          >
+            <XMarkIcon className="w-6 h-6" />
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
@@ -180,28 +184,32 @@ export default function SiteFormPopup({
             onChange={handleChange}
             className="border p-2 rounded"
           />
-          <div className="flex gap-4 items-center">
-            <label>
+          <div className="flex gap-6 items-center">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-800">
               <input
                 type="checkbox"
                 name="type"
                 value="PV"
                 checked={formData.type.includes("PV")}
                 onChange={handleChange}
-              />{" "}
+                className="h-4 w-4 accent-[#0096a2]"
+              />
               PV
             </label>
-            <label>
+
+            <label className="inline-flex items-center gap-2 text-sm text-gray-800">
               <input
                 type="checkbox"
                 name="type"
                 value="BESS"
                 checked={formData.type.includes("BESS")}
                 onChange={handleChange}
-              />{" "}
+                className="h-4 w-4 accent-[#0096a2]"
+              />
               BESS
             </label>
           </div>
+
           <select
             name="region"
             value={formData.region}
@@ -274,7 +282,7 @@ export default function SiteFormPopup({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <label className="block">
             Aerial Photo:{" "}
             <input
@@ -300,7 +308,9 @@ export default function SiteFormPopup({
 
         {isPV && (
           <div>
-            <h3 className="text-xl font-semibold mt-6 mb-2">PV Fields</h3>
+            <h3 className="text-lg font-semibold text-[#0096a2] mb-2 mt-6">
+              PV Fields
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 name="dc_capacity_kw"
@@ -357,7 +367,9 @@ export default function SiteFormPopup({
 
         {isBESS && (
           <div>
-            <h3 className="text-xl font-semibold mt-6 mb-2">BESS Fields</h3>
+            <h3 className="text-lg font-semibold text-[#0096a2] mb-2 mt-6">
+              BESS Fields
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 name="rated_power"
@@ -433,12 +445,11 @@ export default function SiteFormPopup({
         <div className="mt-6 flex justify-end">
           <button
             onClick={handleSubmit}
-            className="bg-[#0096a2] text-white px-6 py-2 rounded shadow"
+            className="bg-[#0096a2] text-white px-6 py-2 rounded shadow w-full mt-8"
           >
             Save Site
           </button>
         </div>
-        
       </div>
     </div>
   );

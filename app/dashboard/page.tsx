@@ -24,11 +24,14 @@ export default function DashboardPage() {
   const [ticketsBySite, setTicketsBySite] = useState({});
   const [siteNameMap, setSiteNameMap] = useState({});
   const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setDarkMode(document.documentElement.classList.contains('dark'));
 
     (async () => {
+      setLoading(true);
+
       const { data: ticketsData } = await supabase.from('tickets').select('*');
       const { count: clientsTotal } = await supabase
         .from('clients')
@@ -60,15 +63,19 @@ export default function DashboardPage() {
         siteMap[t.site_id] = (siteMap[t.site_id] || 0) + 1;
       });
       setTicketsBySite(siteMap);
+
+      setLoading(false);
     })();
   }, []);
 
   const chartText = darkMode ? '#e5e7eb' : '#374151';
   const chartGrid = darkMode ? '#37415133' : '#e5e7eb';
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div className="p-6 space-y-10 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Tickets Overview</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <SummaryCard label="Total Tickets" value={tickets.length} href="/dashboard/tickets" />
@@ -167,5 +174,13 @@ function SummaryCard({ label, value, href }: { label: string; value: number; hre
         <p className="text-3xl font-bold text-[#0096a2] mt-1">{value}</p>
       </div>
     </Link>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#0097a2] border-t-transparent mb-4"></div>
+    </div>
   );
 }

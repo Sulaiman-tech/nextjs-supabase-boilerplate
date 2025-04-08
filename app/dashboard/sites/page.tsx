@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import SiteDetailPopup from "@/components/SiteDetailPopup";
-import SiteFormPopup from "@/components/SiteFormPopup"; // ⬅️ Make sure this path is correct
+import SiteFormPopup from "@/components/SiteFormPopup";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 export default function SitesPage() {
@@ -11,12 +11,14 @@ export default function SitesPage() {
   const [search, setSearch] = useState("");
   const [selectedSite, setSelectedSite] = useState(null);
   const [showAddPopup, setShowAddPopup] = useState(false);
+  const [loading, setLoading] = useState(true); // ⬅️ added loading state
 
   useEffect(() => {
     fetchSites();
   }, []);
 
   const fetchSites = async () => {
+    setLoading(true); // ⬅️ start loading
     const { data, error } = await supabase
       .from("sites")
       .select("*")
@@ -27,11 +29,15 @@ export default function SitesPage() {
     } else {
       setSites(data || []);
     }
+
+    setLoading(false); // ⬅️ end loading
   };
 
   const filteredSites = sites.filter((site) =>
     site.site_name?.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="p-6 space-y-6">
@@ -70,7 +76,9 @@ export default function SitesPage() {
                 className="border-b hover:bg-gray-100 cursor-pointer"
                 onClick={() => setSelectedSite(site)}
               >
-                <td className="px-4 py-3 font-medium text-[#0096a2]">{site.site_name}</td>
+                <td className="px-4 py-3 font-medium text-[#0096a2]">
+                  {site.site_name}
+                </td>
                 <td className="px-4 py-3">{site.type}</td>
                 <td className="px-4 py-3">{site.region}</td>
                 <td className="px-4 py-3">{site.grid_connection_voltage}</td>
@@ -92,8 +100,11 @@ export default function SitesPage() {
         <SiteDetailPopup
           site={selectedSite}
           onClose={() => setSelectedSite(null)}
-          onEdit={() => {}}
-          onDelete={() => {}}
+          onEdit={fetchSites}
+          onDelete={() => {
+            fetchSites(); 
+            setSelectedSite(null);
+          }}
         />
       )}
 
@@ -103,6 +114,15 @@ export default function SitesPage() {
           onSave={fetchSites}
         />
       )}
+    </div>
+  );
+}
+
+// ✅ Blue spinning loading animation
+function LoadingSpinner() {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#0097a2] border-t-transparent mb-4"></div>
     </div>
   );
 }
