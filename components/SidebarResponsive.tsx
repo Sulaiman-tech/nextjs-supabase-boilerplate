@@ -62,8 +62,8 @@ export default function Sidebar({
       icon: <UsersIcon className="w-6 h-6" />,
     },
     {
-      href: "/dashboard/profile",
-      label: "Profile",
+      href: "/dashboard/team",
+      label: "Team",
       icon: <UserCircleIcon className="w-6 h-6" />,
     },
   ];

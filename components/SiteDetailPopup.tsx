@@ -21,16 +21,50 @@ export default function SiteDetailPopup({ site, onClose, onEdit, onDelete }) {
 
   const handleDelete = async () => {
     setDeleting(true);
-    const { error } = await supabase.from("sites").delete().eq("id", site.id);
+
+    const filesToDelete = [];
+
+    if (site.representative_aerial_url) {
+      filesToDelete.push(`sites/site_aerial/${site.representative_aerial_url}`);
+    }
+
+    if (site.representative_layout_url) {
+      filesToDelete.push(`sites/site_layout/${site.representative_layout_url}`);
+    }
+
+    if (site.site_documentation_url) {
+      filesToDelete.push(`sites/site_docs/${site.site_documentation_url}`);
+    }
+
+    console.log("Files to delete:", filesToDelete);
+
+    // Delete files from the 'saferay' bucket
+    if (filesToDelete.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("saferay")
+        .remove(filesToDelete);
+
+      if (storageError) {
+        console.error("Storage deletion error:", storageError.message);
+        toast.error("Error deleting some files from storage.");
+      }
+    }
+
+    // Delete site record from database
+    const { error: dbError } = await supabase
+      .from("sites")
+      .delete()
+      .eq("id", site.id);
+
     setDeleting(false);
     setConfirmDelete(false);
 
-    if (error) {
-      toast.error("Error deleting site: " + error.message);
+    if (dbError) {
+      toast.error("Error deleting site: " + dbError.message);
     } else {
-      toast.success("Site deleted successfully");
-      onDelete(); // This will refresh data in parent without full reload
-      onClose(); // Close the popup
+      toast.success("Site and related files deleted successfully");
+      onDelete();
+      onClose();
     }
   };
 
@@ -95,7 +129,7 @@ export default function SiteDetailPopup({ site, onClose, onEdit, onDelete }) {
         )}
 
         {/* Site Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm text-gray-800 dark:text-gray-200 mb-6 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-gray-800 dark:text-gray-200 mb-6 pt-6">
           {[
             "site_name",
             "official_name",

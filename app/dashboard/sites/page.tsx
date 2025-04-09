@@ -45,12 +45,12 @@ export default function SitesPage() {
         <input
           type="text"
           placeholder="Search"
-          className="flex-grow border px-4 py-2 rounded-md"
+          className="w-full md:flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0096a2] dark:bg-gray-900"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <button
-          className="bg-[#0096a2] text-white px-4 py-2 rounded shadow hover:brightness-90 transition flex items-center gap-2"
+          className="bg-[#0096a2] text-white px-4 py-2 rounded shadow hover:brightness-90 transition flex items-center gap-2 self-start md:self-auto"
           onClick={() => setShowAddPopup(true)}
         >
           <PlusIcon className="w-5 h-5" />
@@ -63,35 +63,41 @@ export default function SitesPage() {
           <thead className="bg-[#0096a2] text-white">
             <tr>
               <th className="px-4 py-4 text-left">Name</th>
-              <th className="px-4 py-4 text-left">Type</th>
-              <th className="px-4 py-4 text-left">Prefecture</th>
-              <th className="px-4 py-4 text-left">GC Voltage</th>
-              <th className="px-4 py-4 text-left">Operator</th>
+              <th className="px-4 py-4 text-left hidden md:table-cell">Type</th>
+              <th className="px-4 py-4 text-left hidden md:table-cell">
+                Prefecture
+              </th>
+              <th className="px-4 py-4 text-left hidden md:table-cell">
+                GC Voltage
+              </th>
+              <th className="px-4 py-4 text-left hidden md:table-cell">
+                Operator
+              </th>
             </tr>
           </thead>
+
           <tbody>
             {filteredSites.map((site) => (
               <tr
                 key={site.id}
-                className="border-b hover:bg-gray-100 cursor-pointer"
+                className="border-b hover:bg-gray-100 hover:dark:bg-gray-600 cursor-pointer"
                 onClick={() => setSelectedSite(site)}
               >
                 <td className="px-4 py-3 font-medium text-[#0096a2]">
                   {site.site_name}
                 </td>
-                <td className="px-4 py-3">{site.type}</td>
-                <td className="px-4 py-3">{site.region}</td>
-                <td className="px-4 py-3">{site.grid_connection_voltage}</td>
-                <td className="px-4 py-3">{site.operator}</td>
-              </tr>
-            ))}
-            {filteredSites.length === 0 && (
-              <tr>
-                <td colSpan={5} className="text-center py-4 text-gray-500">
-                  No sites found.
+                <td className="px-4 py-3 hidden md:table-cell">{site.type}</td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  {site.region}
+                </td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  {site.grid_connection_voltage}
+                </td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  {site.operator}
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
@@ -102,7 +108,7 @@ export default function SitesPage() {
           onClose={() => setSelectedSite(null)}
           onEdit={fetchSites}
           onDelete={() => {
-            fetchSites(); 
+            fetchSites();
             setSelectedSite(null);
           }}
         />
