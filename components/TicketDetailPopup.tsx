@@ -116,12 +116,12 @@ const generatePDF = () => {
       .then((blob) => {
         const reader = new FileReader();
         reader.onloadend = function () {
-          const base64data = reader.result;
+          const base64data = reader.result as string;
           doc.addPage();
           doc.setFontSize(16);
           doc.text("Attached Photo", 20, 20);
           doc.addImage(base64data, "JPEG", 20, 30, 160, 120);
-          doc.save(`${ticket.ticket_name || "ticket"}.pdf`);
+          doc.save(`${ticket.ticket_name || "ticket"}.pdf`);    
         };
         reader.readAsDataURL(blob);
       });
